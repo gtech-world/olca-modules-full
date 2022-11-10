@@ -8,6 +8,10 @@ public interface ConflictResolver {
 
 	boolean isConflict(ModelRef ref);
 
+	default ConflictResolution getResolvedConflict(ModelRef ref) {
+		return null;
+	}
+
 	ConflictResolution resolveConflict(ModelRef ref, JsonObject fromHistory);
 
 	public class ConflictResolution {

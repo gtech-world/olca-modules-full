@@ -85,6 +85,18 @@ public class GitStoreReader implements JsonStoreReader {
 		if (ref == null)
 			return null;
 		var data = datasets.get(ref);
+		if (conflictResolver != null && conflictResolver.isConflict(ref)) {
+			// conflict resolver might pre-solve conflicts, if the resolution is
+			// to keep existing data or use previously merged data we can skip
+			// parsing the remote data
+			var resolution = conflictResolver.getResolvedConflict(ref);
+			if (resolution != null &&
+					(resolution.type == ConflictResolutionType.KEEP
+							|| resolution.type == ConflictResolutionType.MERGE)) {
+				imported.add(ref);
+				return resolution.data;
+			}
+		}
 		var remote = parse(data);
 		if (conflictResolver == null || !conflictResolver.isConflict(ref)) {
 			imported.add(ref);
